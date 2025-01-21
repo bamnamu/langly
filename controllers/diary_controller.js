@@ -39,14 +39,15 @@ exports.delete_diary=async (req, res) =>
 
 exports.save_diary=async(req, res)=>
 {
-    const {content, correct_grammar } = req.body;
+    const {content, emotion} = req.body;
+    console.log(emotion);
     if (!content) return res.status(400).json({ error: '필수값 없음' });
     const { unique_number, nickname } = req.user;
     const user_unique_number=req.user.unique_number;
     const user_nickname=req.user.nickname;
     const query =
     `
-        INSERT INTO diary (user_unique_number, user_nickname, content, grammar_content)
+        INSERT INTO diary (user_unique_number, user_nickname, content, emotion)
         VALUES (?, ?, ?, ?)
     `;
     try
@@ -56,7 +57,7 @@ exports.save_diary=async(req, res)=>
             user_unique_number,
             user_nickname,
             content,
-            correct_grammar || null,
+            emotion,
         ]);
         res.status(201).json
         ({
