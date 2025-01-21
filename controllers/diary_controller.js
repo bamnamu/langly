@@ -4,18 +4,12 @@ const { correct_grammar } = require('../middlewares/openai_helper');
 exports.diary_grammar=async (req, res) =>
 {
     const {content}=req.body;
-    const { unique_number, nickname } = req.user;
-    console.log('nickname from req.user:', nickname);
-    console.log('unique_number from req.user:', unique_number);
-    const user_unique_number=req.user.unique_number;
-    const user_nickname=req.user.nickname;
+    const { unique_number: user_unique_number, nickname: user_nickname } = req.user;
     try
     {
         const grammar_content=await correct_grammar(content);
         res.status(200).json
-        ({
-            grammar_csontent: grammar_content
-        });
+        (grammar_content);
     }
     catch(error)
     {

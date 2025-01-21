@@ -6,10 +6,13 @@ const talk_process=async(req, res)=>
 {
     try
     {
-        const audiopath=req.file?req.file.path:null;
+        const audiopath=req.file?path.resolve(__dirname, '../', req.file.path) : null;
         if(!audiopath) return res.status(400).json({error : "음성 파일 없음...."});
         const audio_text=await audio_to_text(audiopath);
         console.log('음성 텍스트', audio_text);
+        const grammar_result=await correct_grammar(audio_text);
+        console.log(grammar_result);
+        return res.status(200).json({text : audio_text});
     }
     catch(error)
     {

@@ -5,6 +5,7 @@ const morgan = require('morgan'); // 요청 로그를 출력하기 위해 morgan
 const body_parser=require('body-parser');
 require('dotenv').config(); // env파일을 사용하기 위해 사용
 const sql_db=require('./config/sql_db_connect');
+const cors = require('cors');
 const sql_init=require('./config/sql_db_init');
 const auth_route=require('./routes/auth_route');
 const diary_route = require('./routes/diary_route');
@@ -14,6 +15,7 @@ const app=express();
 
 app.use(body_parser.json());
 app.use(morgan('tiny'));
+app.use(cors());
 sql_init();
 app.use('/auth', auth_route);
 app.use('/diary', diary_route);
