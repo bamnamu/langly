@@ -41,6 +41,17 @@ const init_sql_db=async ()=>
     `;
     await sql_db.query(create_diary_table);
     console.log('diary 테이블 존재');
+    const create_word_table=
+    `
+        CREATE TABLE user_generated_words (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_unique_number VARCHAR(255) NOT NULL,
+    language VARCHAR(50) NOT NULL,
+    word VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_unique_number, language, word) -- 사용자-언어-단어 조합의 중복 방지
+);
+    `
     }
     catch (err)
     {

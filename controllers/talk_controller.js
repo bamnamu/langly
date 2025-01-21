@@ -1,5 +1,5 @@
 const sql_db=require('../config/sql_db_connect');
-const { audio_to_text, correct_grammar, generate_sentence }=require('../middlewares/openai_helper');
+const { audio_to_text, correct_grammar, generate_reply, generate_tts, translate }=require('../middlewares/openai_helper');
 const path = require('path');
 
 const talk_process=async(req, res)=>
@@ -12,7 +12,11 @@ const talk_process=async(req, res)=>
         console.log('음성 텍스트', audio_text);
         const grammar_result=await correct_grammar(audio_text);
         console.log(grammar_result);
-        return res.status(200).json({text : audio_text});
+        const reply_result=await generate_reply(grammar_result.corrected, grammar_result.language);
+        console.log(reply_result);
+        const audio_url=await generate_tts(reply_result, grammar_result.language);
+        const korean=await translate(reply_result);
+        return res.status(200).json({audio : audio_url, trans : korean, grammar: grammar_result});
     }
     catch(error)
     {
