@@ -24,14 +24,7 @@ const correct_grammar=async(content)=>
         {
             "language": "언어코드",
             "corrected": "수정된 전체 문장(문장부호 포함)",
-            "explanations":
-            [
-                {
-                    "original": "수정 전 단어(또는 구/문장)",
-                    "corrected": "수정 후 단어(또는 구/문장)",
-                    "reason": "수정 이유"
-                }
-            ]
+            "explanations": "수정 전 단어(또는 구/문장)"는 "수정 후 단어(또는 구/문장)"으로 바꿔야합니다. 그 이유는 "수정 이유"이기 때문입니다.
         }
         문장:
         "${content}"

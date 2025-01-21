@@ -32,7 +32,7 @@ const init_sql_db=async ()=>
             user_unique_number INT NOT NULL,
             user_nickname VARCHAR(255) NOT NULL,
             content TEXT NOT NULL,
-            grammar_content TEXT DEFAULT NULL,
+            emotion ENUM('happy', 'sad', 'angry', 'love') DEFAULT 'happy',
             created DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_unique_number) REFERENCES users(unique_number) ON DELETE CASCADE,
