@@ -8,6 +8,8 @@ exports.generate_five_word=async(req, res)=>
     try
     {
         const five_word=await generate_word_pairs(language);
+        const word_pairs = five_word.word_pairs;
+        if (!word_pairs||!Array.isArray(word_pairs))  return res.status(400).json({ error: '유효하지 않은 단어 쌍 데이터입니다.' });
         res.status(200).json
         ({
             five_word

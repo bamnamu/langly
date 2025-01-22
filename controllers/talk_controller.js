@@ -16,7 +16,7 @@ const talk_process=async(req, res)=>
         console.log(reply_result);
         const audio_url=await generate_tts(reply_result, grammar_result.language);
         const korean=await translate(reply_result);
-        return res.status(200).json({audio : audio_url, trans : korean, grammar: grammar_result});
+        return res.status(200).json({original: audio_text, rely: reply_result, audio : audio_url, trans : korean, grammar: grammar_result});
     }
     catch(error)
     {

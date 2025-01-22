@@ -11,6 +11,7 @@ const auth_route=require('./routes/auth_route');
 const diary_route = require('./routes/diary_route');
 const today_route=require('./routes/today_route');
 const talk_route=require('./routes/talk_route');
+const my_page_route=require('./routes/my_page_route');
 const app=express();
 
 app.use(body_parser.json());
@@ -21,6 +22,7 @@ app.use('/auth', auth_route);
 app.use('/diary', diary_route);
 app.use('/today', today_route);
 app.use('/talk', talk_route);
+app.use('/mypage', my_page_route);
 
 app.get('/', (req, res) =>
 {

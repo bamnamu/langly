@@ -26,6 +26,8 @@ const correct_grammar=async(content)=>
             "corrected": "수정된 전체 문장(문장부호 포함)",
             "explanations": "수정 전 단어(또는 구/문장)"는 "수정 후 단어(또는 구/문장)"으로 바꿔야합니다. 그 이유는 "수정 이유"이기 때문입니다.
         }
+        일본어를 수정할때는 수정 이유로 문장부호는 절대로 넣지마세요(마침표, 물음표등) 만약 수정 이유가 문장부호밖에 없을때는 수정하게 없는걸로 처리하세요.
+        모든 언어는 회화적 표현이 틀린것만 수정해주세요.
         문장:
         "${content}"
         `.trim();
@@ -141,6 +143,8 @@ const generate_sentence=async(language)=>
         if(!language||typeof language!=='string') throw new Error('이 언어는 모루겠어요.....');
         const prompt=`
         Generate five sentence in ${language} and provide its meaning in Korean.
+        다섯 문장은 ${language}로 해주세요.
+        번역은 무조건 한국어로 해주세요.
         Return them in the following JSON format only (do not include anything else):
             {
                 "sentences": [
@@ -260,7 +264,7 @@ const translate=async(content)=>
     catch(error)
     {
         console.error('번역 실패:', error.message);
-        throw new Error('번역역 실패');
+        throw new Error('번역 실패');
     }
 };
     

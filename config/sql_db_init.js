@@ -35,23 +35,43 @@ const init_sql_db=async ()=>
             emotion ENUM('happy', 'sad', 'angry', 'love') DEFAULT 'happy',
             created DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_unique_number) REFERENCES users(unique_number) ON DELETE CASCADE,
-            FOREIGN KEY (user_nickname) REFERENCES users(nickname) ON DELETE CASCADE
+            FOREIGN KEY (user_unique_number) REFERENCES users(unique_number) ON DELETE CASCADE
         );
     `;
     await sql_db.query(create_diary_table);
     console.log('diary 테이블 존재');
-    const create_word_table=
+    const create_word_table =
     `
-        CREATE TABLE user_generated_words (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_unique_number VARCHAR(255) NOT NULL,
-    language VARCHAR(50) NOT NULL,
-    word VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(user_unique_number, language, word) -- 사용자-언어-단어 조합의 중복 방지
-);
+        CREATE TABLE IF NOT EXISTS word
+        (
+            word_unique_number INT AUTO_INCREMENT PRIMARY KEY,
+            user_unique_number INT NOT NULL,
+            word varchar(255) NOT NULL,
+            meaning varchar(255) NOT NULL,
+            language ENUM('japanese', 'spanish', 'english'),
+            created DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_unique_number) REFERENCES users(unique_number) ON DELETE CASCADE,
+            UNIQUE(user_unique_number, word)
+        );
+    `;
+    await sql_db.query(create_word_table);
+    console.log('word 테이블 존재');
+    const create_senentce_table =
     `
+        CREATE TABLE IF NOT EXISTS sentence
+        (
+            sentence_unique_number INT AUTO_INCREMENT PRIMARY KEY,
+            user_unique_number INT NOT NULL,
+            sentence TEXT NOT NULL,
+            meaning TEXT NOT NULL,
+            language ENUM('japanese', 'spanish', 'english'),
+            created DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_unique_number) REFERENCES users(unique_number) ON DELETE CASCADE,
+            UNIQUE(user_unique_number, sentence(255))
+        );
+    `;
+    await sql_db.query(create_senentce_table);
+    console.log('sentence 테이블 존재');
     }
     catch (err)
     {
