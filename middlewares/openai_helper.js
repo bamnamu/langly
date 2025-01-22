@@ -13,52 +13,61 @@ const configuration = new Configuration
 
 const openai = new OpenAIApi(configuration);
 
-const correct_grammar=async(content)=>
-{
-    try
-    {
-        const prompt = `
-        다음 문장을 문법에 맞게 수정하고, 수정한 이유를 간단히 설명해주세요.
-        모든 수정 이유는 한국어로 작성해주세요.
-        아래 JSON 형식 그대로(키 이름까지 동일)만 반환해주세요:
-        {
-            "language": "언어코드",
-            "corrected": "수정된 전체 문장(문장부호 포함)",
-            "explanations": "수정 전 단어(또는 구/문장)"는 "수정 후 단어(또는 구/문장)"으로 바꿔야합니다. 그 이유는 "수정 이유"이기 때문입니다.
-        }
-        일본어를 수정할때는 수정 이유로 문장부호는 절대로 넣지마세요(마침표, 물음표등) 만약 수정 이유가 문장부호밖에 없을때는 수정하게 없는걸로 처리하세요.
-        모든 언어는 회화적 표현이 틀린것만 수정해주세요.
-        문장:
-        "${content}"
+const correct_grammar = async (content) => {
+    try {
+        // 시스템 프롬프트: AI가 반드시 지켜야 할 규칙을 명시
+        const systemPrompt = `
+당신은 문장 교정 도우미입니다.
+
+아래 규칙을 꼭 지키세요:
+
+1. 문법상 어색하거나 틀린 부분만 수정하고, 원문 언어(영어, 일본어 등)는 그대로 유지합니다. 원문 언어는 영어, 일본어, 스페인어중 하나입니다. (한국어로 번역 금지)
+2. 수정 이유는 반드시 한국어로 작성합니다.
+3. "문장부호(마침표, 쉼표, 물음표 등)를 수정 이유로 제시하지 않는다"는 점을 특히 주의하세요.
+   - 일본어에서 마침표, 물음표, 구두점 사용 여부만으로 수정 이유를 작성하지 마십시오.
+   - 대소문자 변경만으로도 수정 이유를 작성하지 마십시오.
+4. 회화적 표현에서 자주 쓰이는 문장부호(마침표, 물음표, 쉼표 등)는 틀린 것으로 보지 않습니다.
+5. 출력 형식: 아래 JSON 형태를 그대로 반환하세요.
+   {
+       "language": "언어코드",
+       "corrected": "수정된 전체 문장(원문의 언어로, 문장부호 포함)",
+       "explanations": "수정 전 'XXX'는 'YYY'로 바꿔야 합니다. 그 이유는 '한국어 설명'이기 때문입니다."
+   }
+6. 수정할 부분이 없는 경우, 원문을 그대로 "corrected"에 쓰고, "explanations"는 "수정할 부분이 없습니다." 정도로 간단히 작성하세요.
+`;
+
+        // 사용자 프롬프트: 실제 교정할 문장만 전달
+        const userPrompt = `
+문장:
+"${content}"
         `.trim();
-        const response = await openai.createChatCompletion
-        ({
-            model: 'gpt-4-turbo',
-            messages:
-            [
-                { role: 'system', content: 'You are a helpful assistant that corrects grammar.' },
-                { role: 'user', content: prompt }
+
+        // ChatCompletion API 호출
+        const response = await openai.createChatCompletion({
+            model: 'gpt-4-turbo', // 사용 모델
+            messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userPrompt }
             ],
         });
+
+        // GPT 응답을 받아 JSON 파싱
         const gpt_text = response.data.choices[0].message.content.trim();
+
         let parsed;
-        try
-        {
+        try {
             parsed = JSON.parse(gpt_text);
-        }
-        catch (err)
-        {
+        } catch (err) {
             console.error('JSON 파싱 실패, GPT 응답:', gpt_text);
             throw new Error('GPT가 유효한 JSON을 반환하지 않았습니다.');
         }
+
         return parsed;
-    }
-    catch(error)
-    {
+    } catch (error) {
         console.error('OpenAI API 호출 실패:', error);
         throw new Error('문법 교정 실패');
     }
-}
+};
 
 const generate_word_pairs=async(language)=>
 {
@@ -199,7 +208,8 @@ const generate_reply=async(content, language)=>
 
         위 질문에 대해 간결하고 친근하고 대화에 적절한 대답을 작성해주세요.
         답변은 "${language}"으로 작성해주세요.
-        가능한 언어는 영어(en), 일본어(ja), 스페인어(es) 중 하나입니다.
+        답변하는 언어는  반드시 무조건 영어(en), 일본어(ja), 스페인어(es) 중 하나입니다.
+        강조합니다. 답변은 "${language}"와 같은 언어로 작성해주세요.
         답변만 반환하고, 입력 내용을 반복하지 마세요.
         입력에 대한 설명을 하지 마세요.
         답변에 입력에 대한 내용을 들어가게 하지 마세요.
@@ -249,7 +259,8 @@ const translate=async(content)=>
     {
         const prompt=`
         ${content}를 한국어로 번역해줘.
-        다른 부연 설명없이, 번역만`;
+        다른 부연 설명없이, 번역만
+        번역을 한국어 회화처럼 자연스럽게 해줘`;
         const response=await openai.createChatCompletion
         ({
             model: 'gpt-4-turbo',

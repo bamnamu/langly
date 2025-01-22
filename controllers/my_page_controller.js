@@ -123,16 +123,14 @@ exports.get_sentences = async (req, res) => {
 
     try {
         const user_unique_number = req.user.unique_number; // 토큰에서 사용자 ID 가져오기
-
         // DB에서 데이터 조회
         const [rows] = await sql_db.query(
-            `SELECT sentence, meaning, created 
+            `SELECT sentence_unique_number, sentence, meaning, created 
              FROM sentence 
              WHERE language = ? AND user_unique_number = ? 
              ORDER BY created DESC`,
             [language, user_unique_number]
         );
-
         res.status(200).json({ sentences: rows });
     } catch (error) {
         console.error('문장 조회 실패:', error);
