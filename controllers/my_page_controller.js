@@ -9,7 +9,7 @@ exports.get_word = async (req, res) => {
     try {
         // DB에서 데이터 조회
         const [rows] = await sql_db.query(
-            `SELECT word, meaning, created 
+            `SELECT word_unique_number, word, meaning, created 
              FROM word 
              WHERE language = ? AND user_unique_number = ? 
              ORDER BY created DESC`,
